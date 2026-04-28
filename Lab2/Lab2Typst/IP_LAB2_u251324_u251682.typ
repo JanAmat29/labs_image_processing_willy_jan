@@ -216,11 +216,11 @@ It will be easier to understand this second method if we plot the spatial domain
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-        #figure(image("Images/shear_horizontal_example.png",width:50%), caption: "Result of applying the horizontal shear operator to the image of the pants with a value of a equal to 0.4",
+        #figure(image("Images/shear_horizontal_example.png",width:50%), caption: "Horizontal shear operator applied to the image of the pants with a value of a equal to 0.4",
     )<colab:shear_horizontal_example>
     ],
     [
-        #figure(image("Images/shear_vertical_example.png", width:50%), caption: "Result of applying the vertical shear operator to the image of the pants with a value of a equal to 0.4",
+        #figure(image("Images/shear_vertical_example.png", width:50%), caption: "Vertical shear operator applied to the image of the pants with a value of a equal to 0.4",
     )<colab:shear_vertical_example>
     ],
 )
@@ -244,11 +244,11 @@ For the last part of the exercise, we applied Yaroslavski's method to rotate the
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-        #figure(image("Images/rotation_result.png",width:50%), caption: "Result of applying Yaroslavski's method to rotate the image of the pants by 90 degrees",
+        #figure(image("Images/rotation_result.png",width:50%), caption: "Yaroslavski's method of rotating the image of the pants by 90 degrees",
     )<colab:rotation_result>
     ],
     [
-        #figure(image("Images/naive_rotation_result.png", width:50%), caption: "Result of applying a naive rotation method that directly calculates the new coordinates for each pixel and uses 2D interpolation",
+        #figure(image("Images/naive_rotation_result.png", width:50%), caption: "Naive rotation of the image of the pants by 90 degrees",
     )<colab:naive_rotation_result>
     ],
 )
@@ -259,11 +259,11 @@ At first we can not notice any difference between the two resulting images, that
     columns: (1fr, 1fr),
     gutter: 1em,
     [
-        #figure(image("Images/rotation_result_50.png",width:50%), caption: "Result of applying Yaroslavski's method to rotate the image of the pants by 7.2 degrees fifty times in a row",
+        #figure(image("Images/rotation_result_50.png",width:50%), caption: "Yaroslavski's method of rotating the pants by 7.2 degrees fifty times in a row",
     )<colab:rotation_result_50>
     ],
     [
-        #figure(image("Images/naive_rotation_result_50.png", width:50%), caption: "Result of applying a naive rotation method that directly calculates the new coordinates for each pixel and uses 2D interpolation to rotate the image of the pants by 7.2 degrees fifty times in a row",
+        #figure(image("Images/naive_rotation_result_50.png", width:50%), caption: "Naive rotation of the pants by 7.2 degrees fifty times in a row",
     )<colab:naive_rotation_result_50>
     ],
 )
