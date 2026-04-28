@@ -192,4 +192,86 @@ In our results, ringing does not appear clearly. Ringing is related to the Gibbs
 In this experiment, we used an average filter in the spatial domain, not an ideal sharp cut-off filter in the Fourier domain. Because of that, the ringing effect is not very noticeable. If ringing appeared, it could be reduced by using smoother filters, for example a Gaussian filter, instead of using a very abrupt binary mask in the Fourier domain. The lab material also explains that binary masks can produce ringing because they are not smooth, while Gaussian masks reduce this effect better.
 
 
+= (ADD TITLE)
+
+= ANALYSIS OF IMAGE ROTATION
+
+//Implement a precise shear operator, which performs the following affine transformation of the domain of an image: (x, y)→ (x+ay,y) where a is any real number. Once done, you can implement the method of Yaroslavski to rotate an image (pages 80 81 of the notes or exercise 8 of the Seminar 3). According to this method, a rotation is expressed as the product of three shears. Having obtained the appropriate translations for a an angle equal to pi/2 radians, compare the results of this method with the naıve methods for rotations (rotate and interpolate pixel values) or using a drawing program (paint or similar).
+
+== Introduction
+
+Once read the statement of the execise we observe familiar topics that were explained in the theory lessons. The first part of the exercise asks us to implement a shear operator, described by the transformation (x, y)→ (x+ay,y). This is a type of affine transformation that shifts the x-coordinate of each pixel by an amount proportional to its y-coordinate. The second part of the exercise asks us to implement Yaroslavski's method for rotating an image, which expresses a rotation as a product of three shear operations. 
+
+== Shear operator
+
+To implement the shear operator we could simply shift each row by the fractional amount given by the parameter a. But the problem here is that we would get a blurry image and a lost in the high frequencies. The reason for that is that this method requires interpolating pixel values, which is not ideal for this kind of transformation. Instead, as the most of the cases in the transformation of images, it is better to apply the transformation in the Fourier domain. In this case, we can take into account the Fourier Shift Theorem, which states that a shift in the spatial domain corresponds to a multiplying it by a linear phase factor in the frequency domain. The process would be:
+
++ Apply FFT to convert the image to the frequency domain
++ Multiply each frequency component $u$ of row $y$ by the phase shift  $e^("j"2pi"u"·(a · y) / N)$ 
++ Apply the 1D Inverse FFT (IFFT) to get the perfectly shifted row back in the spatial domain.
+
+It will be easier to understand this second method if we plot the spatial domain for a simple image, for example for @labs:pantalons. In the next section we will see that for applying the Yaroslavski's method we will need to apply the shear operator three times, where two of them will be an horizontal shear and the other one will be a vertical shear. So, for the horizontal shears we will apply the method explained above, and for the vertical shear we will apply the same method but shifting columns instead of rows. In @colab:shear_horizontal_example we can see the result of applying the horizontal shear operator to the image of the pants with a value of a equal to 0.4. And in @colab:shear_vertical_example we can see the result of applying the vertical shear operator to the image of the pants with a value of a equal to 0.4.
+
+#grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+        #figure(image("Images/shear_horizontal_example.png",width:50%), caption: "Result of applying the horizontal shear operator to the image of the pants with a value of a equal to 0.4",
+    )<colab:shear_horizontal_example>
+    ],
+    [
+        #figure(image("Images/shear_vertical_example.png", width:50%), caption: "Result of applying the vertical shear operator to the image of the pants with a value of a equal to 0.4",
+    )<colab:shear_vertical_example>
+    ],
+)
+
+== Yaroslavski's method for rotation
+
+A standard 2D rotation matrix requires calculating new $(x,y)$ coordinates for every pixel, which demands computationally heavy and lossy 2D interpolation. Yaroslavski's method decomposes a rotation into three shear operations, which can be implemented more efficiently. The steps for a rotation by an angle $theta$ are:
+1. Shear horizontally by $a = -tan(theta/2)$
+2. Shear vertically by $b = sin(theta)$
+3. Shear horizontally again by $c = -tan(theta/2)$
+
+For a rotation of $pi/2$ radians, the values of the shears would be: a = -tan(pi/4) = -1 b = sin(pi/2) = 1 c = -tan(pi/4) = -1.
+
+Applying these three shears in sequence will rotate the image by 90 degrees. The advantage of this method is that each shear can be implemented using 1D interpolation, which is computationally more efficient than 2D interpolation required for a direct rotation. After applying Yaroslavski's method, we can compare the result with a naive rotation method that directly calculates the new coordinates for each pixel and uses 2D interpolation, or with a rotation done using a drawing program. The results should be similar, but Yaroslavski's method should be more efficient and may produce less blurring due to the use of 1D interpolation. 
+
+== Results
+
+For the last part of the exercise, we applied Yaroslavski's method to rotate the image of the pants by 90 degrees. The resulting image can be seen in @colab:rotation_result. We also applied a naive rotation method that directly calculates the new coordinates for each pixel and uses 2D interpolation, and the result can be seen in @colab:naive_rotation_result.
+
+#grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+        #figure(image("Images/rotation_result.png",width:50%), caption: "Result of applying Yaroslavski's method to rotate the image of the pants by 90 degrees",
+    )<colab:rotation_result>
+    ],
+    [
+        #figure(image("Images/naive_rotation_result.png", width:50%), caption: "Result of applying a naive rotation method that directly calculates the new coordinates for each pixel and uses 2D interpolation",
+    )<colab:naive_rotation_result>
+    ],
+)
+
+At first we can not notice any difference between the two resulting images, that is because only one rotation is not sufficietly to see the difference. So we applied the same rotation fifty times in a row, for an angle of 360/50 = 7.2 degrees that would result in a full rotation. The resulting images can be seen in @colab:rotation_result_50 and @colab:naive_rotation_result_50.
+
+#grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+        #figure(image("Images/rotation_result_50.png",width:50%), caption: "Result of applying Yaroslavski's method to rotate the image of the pants by 7.2 degrees fifty times in a row",
+    )<colab:rotation_result_50>
+    ],
+    [
+        #figure(image("Images/naive_rotation_result_50.png", width:50%), caption: "Result of applying a naive rotation method that directly calculates the new coordinates for each pixel and uses 2D interpolation to rotate the image of the pants by 7.2 degrees fifty times in a row",
+    )<colab:naive_rotation_result_50>
+    ],
+)
+
+Now we can see that the resulting image of Yaroslavski's method is really similar to the original image, while the resulting image of the naive rotation method is really blurry and it is hard to recognize the original image. Hence, we can conclude that Yaroslavski's method is more efficient and produces less blurring than the naive rotation method, especially when applying multiple rotations in sequence.
+
+
+
+
+
 
