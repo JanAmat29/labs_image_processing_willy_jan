@@ -265,7 +265,7 @@ The results show that integer translations and sub-pixel translations behave dif
 This is especially visible in the signal $y$, because a single impulse cannot be moved half a sample without spreading its value around. The same idea applies to images: when an image is translated by a non-integer number of pixels, the new pixel values have to be estimated from neighbouring pixels. For this reason, sub-pixel transformations usually create smoother transitions and decimal values.
 
 In conclusion, the Fourier shift theorem lets us translate signals by fractional distances without using a simple rounded shift. Applying 0.5 pixels twice or 0.1 pixels ten times gives approximately a 1-pixel displacement, although small numerical differences can appear because of floating point precision.
-
+#pagebreak()
 
 = ANALYSIS OF IMAGE ROTATION
 
