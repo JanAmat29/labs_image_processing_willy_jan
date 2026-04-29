@@ -198,7 +198,7 @@ For subsampling by a factor of 4, the filtering has to be stronger. The image is
 
 == Ringing
 
-In our results, ringing does not appear clearly. Ringing is related to the Gibbs phenomenon, which appears as oscillations around sharp discontinuities. In images, it can be seen as bands or ripples near edges, especially when high frequencies are removed too abruptly.
+In our results, ringing does not appear clearly. Ringing is related to the Gibbs phenomenon, which appears as oscillations around sharp discontinuities. In our case, that are images, it can be seen as bands or ripples near edges, especially when high frequencies are removed too abruptly.
 
 In this experiment, we used an average filter in the spatial domain, not an ideal sharp cut-off filter in the Fourier domain. Because of that, the ringing effect is not very noticeable. If ringing appeared, it could be reduced by using smoother filters, for example a Gaussian filter, instead of using a very abrupt binary mask in the Fourier domain. The lab material also explains that binary masks can produce ringing because they are not smooth, while Gaussian masks reduce this effect better.
 
