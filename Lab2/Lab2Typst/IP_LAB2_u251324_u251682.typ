@@ -177,6 +177,11 @@ Before shrinking the image, we applied a low-pass filtering step. This is necess
 
 When the image is made smaller without any previous filtering, these high frequencies cannot be represented correctly in the reduced image. As a consequence, they appear as strange patterns or distorted textures. For this reason, the image has to be smoothed before subsampling. This reduces or removes the frequencies that would not fit correctly in the smaller image. In our case, this low-pass filtering step helps the stripes of the pants look more stable after subsampling.
 
+#figure(image("Images/Subsampling_factor2_4_8.png", width:70%), caption: "Result of subsampling the image of the pants without pre-processing",
+    )<colab:pantalons_subsampled_no_filter>
+
+#figure(image("Images/Subsampling_afetr_filtering_factor2_4_8_filtered.png", width:70%), caption: "Result of subsampling the image of the pants with pre-processing",
+    )<colab:pantalons_subsampled_filtered>
 == Pre-processing for factor 2 and factor 4
 
 For subsampling by a factor of 2, we used a smoothing filter before taking every other pixel. In our case, we applied a 3x3 average filter. This works because the reduction is not too strong. The image loses some detail, but a light blur is enough to remove many of the high frequencies that would cause aliasing.
@@ -185,6 +190,12 @@ The theory explains subsampling of order 2 as keeping samples such as $f_(2k)$. 
 
 For subsampling by a factor of 4, the filtering has to be stronger. The image is reduced much more, so more high-frequency information must be removed before applying the subsampling. In this case, we used a 5x5 average filter. The result is more blurred than with a factor of 2, but this is expected. The purpose of the filter is to remove details that would later become aliasing artifacts. In general, the larger the subsampling factor, the stronger the low-pass filtering has to be.
 
+#figure(image("Images/comparison_factor2_factor2filtered.png", width:70%), caption: "Result of subsampling the image of the pants with pre-processing for factor 2 and factor 4",
+    )<colab:pantalons_subsampled_filtered_2_4>
+
+#figure(image("Images/comparison_factor4_factor4filtered.png", width:70%), caption: "Result of subsampling the image of the pants with pre-processing for factor 2 and factor 4",
+    )<colab:pantalons_subsampled_filtered_4>
+
 == Ringing
 
 In our results, ringing does not appear clearly. Ringing is related to the Gibbs phenomenon, which appears as oscillations around sharp discontinuities. In images, it can be seen as bands or ripples near edges, especially when high frequencies are removed too abruptly.
@@ -192,7 +203,59 @@ In our results, ringing does not appear clearly. Ringing is related to the Gibbs
 In this experiment, we used an average filter in the spatial domain, not an ideal sharp cut-off filter in the Fourier domain. Because of that, the ringing effect is not very noticeable. If ringing appeared, it could be reduced by using smoother filters, for example a Gaussian filter, instead of using a very abrupt binary mask in the Fourier domain. The lab material also explains that binary masks can produce ringing because they are not smooth, while Gaussian masks reduce this effect better.
 
 
-= (ADD TITLE)
+= SUB-PIXEL TRANSLATION
+
+== Introduction
+
+In this exercise, we worked with two simple one-dimensional signals and translated them to the right. The first signal, $x$, is a step-like signal where the first values are 0 and the last values are 1. The second signal, $y$, is more like an impulse, because it only has one value equal to 1 and the rest are 0. These two examples are useful because it is easy to see what happens when the signal is shifted.
+
+The main point of the exercise is not only to translate the signal by an integer number of pixels, but also to understand what happens when the translation is smaller than one pixel. This is called a sub-pixel translation. In that case, the values cannot simply be moved from one position of the array to another, because there is no exact array index for a displacement like 0.5 or 0.1 pixels.
+
+#figure(image("Images/Original_x.png", width:50%), caption: "Signals used for the translation exercise",
+    )<colab:signals>
+#figure(image("Images/Original_y.png", width:50%), caption: "Signals used for the translation exercise",
+    )<colab:signals>
+== Translation using the Fourier shift theorem
+
+To do the translation, we used the Fourier shift theorem. The idea is that instead of moving the samples directly in the spatial domain, we transform the signal to the frequency domain using the FFT. Then we multiply the Fourier coefficients by a phase factor that depends on the translation distance. Finally, we apply the inverse FFT to return to the spatial domain.
+
+This method is useful because it allows translations by non-integer values. If we tried to translate the signal directly in the array, we could only move it by complete positions, for example 1 pixel or 2 pixels. But using the Fourier domain, a displacement of 0.5 pixels or 0.1 pixels can also be represented.
+
+In our implementation, a positive value of the displacement moves the signal to the right. After applying the inverse FFT, the result can contain small decimal values, and sometimes very small numerical errors. These errors are expected because the computation is done with floating point numbers.
+
+== Translation by 0.5 pixels
+
+When the signal is translated by 0.5 pixels, the result is no longer made only of 0s and 1s. The values are distributed between neighbouring positions. This makes sense because the signal has been moved half way between two samples, so the new signal cannot be represented as a simple copy of the original one.
+
+For the signal $x$, the transition between 0 and 1 becomes smoother and spreads around the original edge. For the signal $y$, the single impulse is also spread into several values instead of staying as a single value equal to 1. This is one of the clearest effects of sub-pixel translation: the signal keeps the same general structure, but the energy is shared between nearby samples.
+
+Then we repeated the displacement of 0.5 pixels twice. Since $0.5 + 0.5 = 1$, the final result should be equivalent to translating the signal by one complete pixel to the right. In the results, this is what we observe. The intermediate result after the first translation contains fractional values, but after the second translation the signal is much closer to an integer-pixel shift.
+
+#figure(image("Images/x_translated_0.5.png", width:70%), caption: "Result of translating the signals by 0.5 pixels",
+    )<colab:translation_05>
+
+#figure(image("Images/y_translated_0.5.png", width:70%), caption: "Result of translating the signals by 0.5 pixels twice",
+    )<colab:translation_05_twice>
+
+== Translation by 0.1 pixels
+
+We also repeated the same experiment with a smaller displacement of 0.1 pixels. In this case, the changes after a single translation are more subtle. The signal is only moved by a very small amount, so the shape changes less than with the 0.5 pixel translation.
+
+However, when the 0.1 pixel displacement is applied ten times, the total displacement is again one full pixel. The interesting part here is that we can see the signal moving little by little at each step. Each intermediate result is slightly different from the previous one, and after ten repetitions the final result is approximately the same as applying a translation of 1 pixel.
+
+This also shows that small sub-pixel translations can accumulate. Even if one step of 0.1 pixels seems almost invisible, repeating it several times produces a clear displacement.
+
+#figure(image("Images/x_and_y_translated_0.1.png", width:70%), caption: "Result of translating the signals by 0.1 pixels",
+    )<colab:translation_01>
+
+== Interpretation
+
+The results show that integer translations and sub-pixel translations behave differently. With an integer translation, the signal is basically moved from one sample position to another. With a sub-pixel translation, the signal has to be reconstructed between samples, so the output contains intermediate values.
+
+This is especially visible in the signal $y$, because a single impulse cannot be moved half a sample without spreading its value around. The same idea applies to images: when an image is translated by a non-integer number of pixels, the new pixel values have to be estimated from neighbouring pixels. For this reason, sub-pixel transformations usually create smoother transitions and decimal values.
+
+In conclusion, the Fourier shift theorem lets us translate signals by fractional distances without using a simple rounded shift. Applying 0.5 pixels twice or 0.1 pixels ten times gives approximately a 1-pixel displacement, although small numerical differences can appear because of floating point precision.
+
 
 = ANALYSIS OF IMAGE ROTATION
 
@@ -269,9 +332,3 @@ At first we can not notice any difference between the two resulting images, that
 )
 
 Now we can see that the resulting image of Yaroslavski's method is really similar to the original image, while the resulting image of the naive rotation method is really blurry and it is hard to recognize the original image. Hence, we can conclude that Yaroslavski's method is more efficient and produces less blurring than the naive rotation method, especially when applying multiple rotations in sequence.
-
-
-
-
-
-
