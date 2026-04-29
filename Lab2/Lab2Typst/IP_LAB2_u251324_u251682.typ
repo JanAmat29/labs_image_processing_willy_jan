@@ -211,10 +211,20 @@ In this exercise, we worked with two simple one-dimensional signals and translat
 
 The main point of the exercise is not only to translate the signal by an integer number of pixels, but also to understand what happens when the translation is smaller than one pixel. This is called a sub-pixel translation. In that case, the values cannot simply be moved from one position of the array to another, because there is no exact array index for a displacement like 0.5 or 0.1 pixels.
 
-#figure(image("Images/Original_x.png", width:50%), caption: "Signals used for the translation exercise",
+#grid(
+    columns: (1fr, 1fr),
+    gutter: 1em,
+    [
+
+#figure(image("Images/Original_x.png", width:100%), caption: "Signals used for the translation exercise",
     )<colab:signals>
-#figure(image("Images/Original_y.png", width:50%), caption: "Signals used for the translation exercise",
+    ],
+    [
+#figure(image("Images/Original_y.png", width:100%), caption: "Signals used for the translation exercise",
     )<colab:signals>
+    ],
+)
+
 == Translation using the Fourier shift theorem
 
 To do the translation, we used the Fourier shift theorem. The idea is that instead of moving the samples directly in the spatial domain, we transform the signal to the frequency domain using the FFT. Then we multiply the Fourier coefficients by a phase factor that depends on the translation distance. Finally, we apply the inverse FFT to return to the spatial domain.
