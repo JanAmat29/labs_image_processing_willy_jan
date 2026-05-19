@@ -1,6 +1,7 @@
 #import "@preview/typsidian:0.0.1": *
 #import calc: round, abs
 
+
 #set page(
   margin: (top: 5.2cm, left: 1.2cm, right: 1.2cm, bottom: 1.5cm),
   header: {
@@ -42,6 +43,7 @@
 
 #set text(font: "Computer Modern", size: 11pt, lang: "en", fill: black)
 #set par(justify: true, leading: 0.85em)
+#show figure.caption: set text(size: 0.85em)
 
 #align(center)[
   #text(size: 24pt, weight: "bold")[Contrast, equalization and quantization]
@@ -64,7 +66,12 @@ Gamma correction is a non-linear function that takes place in the mathematical a
 #set math.equation(numbering: "(1)")
 $ u = Q \{ Pi g(K * O) + n \} $ <MathArchImg>
 
-Answering to the question, if gamma is less than 1, the function will be concave, which means that dark tonalities are expanded and light tonalities are compressed, resulting in increased contrast in the shadows. On the other hand, if gamma is greater than 1, the function will be convex, which means that dark tonalities are compressed and light tonalities are exapanded. In this case, the result will be a decrease in shadow contrast, but an increase in highlight contrast. 
+Answering to the question, if gamma is less than 1, the function will be concave, which means that dark tonalities are expanded and light tonalities are compressed, resulting in increased contrast in the shadows. On the other hand, if gamma is greater than 1, the function will be convex, which means that dark tonalities are compressed and light tonalities are exapanded. In this case, the result will be a decrease in shadow contrast, but an increase in highlight contrast. In @GammaGraph, we can see the graphical representation of the gamma correction function for both cases, where the x-axis represents the input light levels and the y-axis represents the output light levels after applying gamma correction. 
+
+#figure(
+  image("img/gamma_graph.png", width: 60%),
+  caption: "Graphical representation of the gamma correction function for gamma < 1 (purple line) and gamma > 1 (yellow line)."
+)<GammaGraph>
 
 There are two examples that clearly explain this behaviour. The first one is to look at the graphical representation (@GammaCorrection) of the function with gamma greater than 1, where we can see how a light level input is expanded. This graphical representation of the gamma correction is given in the theoretical slides.
 
@@ -125,6 +132,175 @@ The final comparision between the low contrast image and the final result would 
   image("img/FinalComparison_exercise2.1.png", width: 100%),
   caption: "Final comparison between the low contrast image and the gamma-corrected result."
 )<FinalComparisonEx2.1>
+
+/* 
+Exercise 3. Image Histogram Equalization
+Exercise 3a. Display: (a) the histogram of an RGB image (R, G, B separate histograms),
+and (b) the histogram of a grayscale image.
+Exercise 3b. Implement a function to perform image equalization. Use it to equalize
+several images. Display the result of equalization and compare the histograms of the
+original images with the equalized ones
+
+ */
+
+= Image Histogram Equalization
+
+== Display of Histograms
+
+To display the histograms of a RGB and grayscale image we have chosen the images of "img/lena_color.png" and"img/lena.png" respectively (@LenaColorImage and @LenaGrayImage).
+
+/*Example of grid structure
+  #grid(
+    columns: (1fr, 1fr, 1fr),
+    gutter: 1em,
+    [
+        #figure(image("Images/filter_ai.png",width:100%), caption: "Ideal filter created by AI",
+        )<colab:filter_ai>
+    ],
+      [
+          #figure(image("Images/lena_freq_ai.png", width:100%), caption: "FFT of the noisy image with the ideal filter applied",
+          )<colab:lena_freq_ai>
+      ],
+    [
+        #figure(image("Images/lena_result_ai.png", width:100%), caption: "Resulting image after applying the ideal filter",
+        )<colab:lena_result_ai>
+    ],
+)
+
+ */
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 1em,
+
+  [
+    #figure(
+      image("img/lena_color.png", width: 60%),
+      caption: "Original RGB image."
+    )<LenaColorImage>
+  ],
+
+  [
+    #figure(
+      image("img/lena.png", width: 60%),
+      caption: "Original grayscale image."
+    )<LenaGrayImage>
+  ],
+)
+
+Thanks to the function `plt.hist(image.ravel(), bins = 256)` found in the given notebook's code, we can display the histograms of both images (@HistogramsRGB and @HistogramGray).
+
+//There are only two histograms, one for the RGB image and one for the grayscale image, but the RGB histogram is separated into three channels, so we will display them separately in a grid.
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 1em,
+
+  [
+    #figure(
+      image("img/histogram_rgb.png", width: 100%),
+      caption: "Histogram of the RGB image separated into R, G and B channels."
+    )<HistogramsRGB>
+  ],
+
+  [
+    #figure(
+      image("img/histogram_gray.png", width: 100%),
+      caption: "Histogram of the grayscale image."
+    )<HistogramGray>
+  ],
+)
+
+As is precised in the caption of @HistogramsRGB, the histogram of the RGB image is separated into R, G and B channels, where we can see that the red channel has a higher frequency of pixel intensities in the range of 100 to 200, while the green and blue channels have a more uniform distribution of pixel intensities. On the other hand, the histogram of the grayscale image shows a more uniform distribution of pixel intensities across the entire range from 0 to 255, with a slight peak around the intensity value of 128. This indicates that the grayscale image has a more balanced distribution of light and dark pixels compared to the RGB image.
+
+== Image Equalization
+
+By introducing the histogram equalization is a technique used to enhance the contrast of an image by redistributing the pixel intensity values. The goal is to achieve a more uniform distribution of pixel intensities across the entire range, which can help to reveal details that may be hidden in the original image.
+
+To perform histogram equalization, we must remind that the formula to compute the new pixel intensity values is given by:
+
+$ h(v) = "round"( ("cdf"(v) - "cdf"_"min") / (N - "cdf"_"min") times (L - 1) ) $ <HistogramEqualizationFormula>
+
+Where $h(v)$ is the new pixel intensity value, $"cdf"(v)$ is the cumulative distribution function of the pixel intensity values, $"cdf"_"min"$ is the minimum value of the cumulative distribution function, $N$ is the total number of pixels in the image, and $L$ is the number of possible intensity levels (usually 256 for an 8-bit image).
+
+Translating @HistogramEqualizationFormula into python code, we can implement the histogram equalization function as follows:
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+def equalize_histogram(image):
+        
+    # 1. Calculate the histogram (256 bins for 8-bit image)
+    hist, bins = np.histogram(image.flatten(), bins=256)
+
+    # 2. Calculate the Cumulative Distribution Function (CDF)
+    cdf = hist.cumsum()
+    
+    # The Equalization Formula
+    L = 2**8  # Number of possible intensity levels (256)
+    cdf = (cdf - cdf.min()) * (L - 1) / (cdf.max() - cdf.min())
+```
+
+After implementing the histogram equalization function, we can apply it to several images and compare the results. For example, we can apply it to the girl low contrast image (@LowContrastImage) and to more low contrast images found in the images folder like @GabeLowContrast and @HatLowContrast and then display the results along with their histograms.
+
+// display gabe low contrast image and hat low contrast image
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 1em,
+
+  [
+    #figure(
+      image("img/gabe_low_contrast.jpg", width: 51%),
+      caption: "Original low contrast image of Gabe."
+    )<GabeLowContrast>
+  ],
+
+  [
+    #figure(
+      image("img/hat.jpg", width: 60%),
+      caption: "Original low contrast image of a hat."
+    )<HatLowContrast>
+  ],
+)
+
+We will compare the histogram equalization results image by image. Starting with the girl we can see the comparision image in @GrilEqualResult, where we can see that the histogram equalization has enhanced the contrast of the image, making the details in the shadows and highlights more visible. The histogram of the equalized image shows a more uniform distribution of pixel intensities across the entire range compared to the original image, which had a more concentrated distribution of pixel intensities in the mid-range.
+
+#figure(
+  image("img/girl_equalized.png", width: 100%),
+  caption: "Comparison between the original low contrast image of the girl and the histogram equalized image."
+)<GrilEqualResult>
+
+When it comes to the Gabe image, it is also possible to make a comparison using @GabeEqualResult. It is clear that, despite the equalization process taking place, the visual result achieved is not even close to being similar to the one obtained for the girl. Although the mathematical process caused the pixel intensities to be spread out all the way from zero to maximum, the visual outcome was not natural at all; on the contrary, it was very noisy.
+
+The reason behind the failure of the equalization process in the Gabe case can be easily found in the histograms. The problem is that the original image contained very few pixels, which were clustered together in a tiny distribution. When trying to stretch this distribution across the whole spectrum of pixel intensities, it resulted in huge gaps between individual pixels in the histogram.
+
+#figure(
+  image("img/gabe_equalized.png", width: 100%),
+  caption: "Comparison between the original low contrast image of Gabe and the histogram equalized image."
+)<GabeEqualResult>
+
+Finally, we analyze the woman dressing the hat, depicted in @HatEqualResult, which can be considered the most successful example of histogram equalization amongst all the images analyzed. It is a very realistic result, with detail like the freckles in the textures being clearly visible and well-preserved.
+
+This is owed entirely to the intrinsic structure of pixel data in this particular image. Firstly, the image is formed almost entirely of dense, high-frequency textures such as the shapes of the face and the clothing, and does not contain any large areas of uniformly colored background. Consequently, its histogram does not feature the large spikes in pixel density that normally disrupt and distort the Cumulative Distribution Function (CDF).
+
+As a result, the equalization algorithm is able to evenly stretch the compressed pixel densities across the whole dynamic range without introducing any quantization or clipping artifacts. Given that the underlying image data is sufficiently continuous and dense, there are no sudden discontinuities introduced into the histogram through the process of stretching.
+
+#figure(
+  image("img/hat_equalized.png", width: 100%),
+  caption: "Comparison between the original low contrast image of the hat and the histogram equalized image."
+)<HatEqualResult>
+
+
+
+
+
+
+
+
+
+
 
 
 
