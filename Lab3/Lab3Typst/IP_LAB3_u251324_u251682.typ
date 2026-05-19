@@ -292,6 +292,66 @@ As a result, the equalization algorithm is able to evenly stretch the compressed
   caption: "Comparison between the original low contrast image of the hat and the histogram equalized image."
 )<HatEqualResult>
 
+= Image Entroy
+
+/*
+Exercise 5. Quantization
+Exercise 5a. Determine experimentally the smallest number (approximately) of levels
+for which the quantization is unnoticeable for the eye.
+Exercise 5b. Binarize an image using the attached uniform quantizer.m function.
+*/
+
+= Quantization
+
+== Experimental smallest quantization levels
+
+As is detailed in the statement of the exercise, experimentally we have evaluated Gray Lena image @LenaGrayImage with different levels of quantization, the function given in the notebook `uniform_quantizer(image, N)`, where `N` is the number of quantization levels, has helped to perform the quantization process. 
+
+/*
+CODE USED
+import matplotlib.pyplot as plt
+
+# 1. Ensure your instructor's function is defined
+# (Paste the def uniform_quantizer... code here)
+
+# 2. Run the Experiment to find the "unnoticeable" threshold
+test_levels = [128, 64, 32, 16, 8, 4]
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+axes = axes.flatten()
+
+for i, levels in enumerate(test_levels):
+    # USE YOUR NOTEBOOK'S FUNCTION HERE:
+    q_img = uniform_quantizer(lena, levels)
+    
+    # Plot it
+    axes[i].imshow(q_img, cmap='gray', vmin=0, vmax=255)
+    axes[i].set_title(f"Quantized to {levels} Levels")
+    axes[i].axis('off')
+
+plt.tight_layout()
+plt.show()
+ */
+
+We consider the following quantization levels: 128, 64, 32, 16, 8 and 4 in @TestQuantization. After applying the quantization, we can visually analyze that from this quantization levels, the smallest that is unnoticeable is 32 levels. 16 levels already shows a significant loss of detail, mostly on the background, while 32 levels still retains most of the visual information and details without introducing significant artifacts. Therefore, we can conclude that the smallest number of quantization levels for which the quantization is unnoticeable for the eye is approximately 32 levels.
+
+#figure(
+  image("img/test_quantization.png", width: 100%),
+  caption: "Quantization of the grayscale Lena image with different levels of quantization."
+)<TestQuantization>
+
+== Binarization of an image
+
+To binarize an image, we can use the `uniform_quantizer` function with `N=2`, which will quantize the image into two levels: 0 and 255. This effectively creates a binary image where pixels are either black (0) or white (255) based on a threshold determined by the quantization process. For example, if we apply this to the grayscale Lena image (@LenaGrayImage), we can obtain the binarized version of the image (@BinarizedLena).
+
+#figure(
+  image("img/binarized_lena.png", width: 100%),
+  caption: "Binarized version of the grayscale Lena image using uniform quantization with N=2."
+)<BinarizedLena>
+
+
+
+
 
 
 
