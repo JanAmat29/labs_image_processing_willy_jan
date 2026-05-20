@@ -343,6 +343,26 @@ As a result, the equalization algorithm is able to evenly stretch the compressed
 )<HatEqualResult>
 
 = Image Entroy
+In this exercise, we implemented a function to calculate the entropy of an image and used it to compare an original grayscale image with its equalized version. Entropy is a quantitative measure of the amount of information or variability contained in the gray-level distribution of an image. In other words, it indicates how spread out the pixel intensities are among the different possible levels.
+
+The entropy of an image is defined as:
+
+$
+H = - sum_(i=0)^255 p_i log_2(p_i)
+$
+
+where $p_i$ is the probability of occurrence of the gray level $i$. To compute this value, we first calculated the histogram of the image using 256 bins, corresponding to all possible intensity values between 0 and 255. Then, we normalized the histogram by dividing each frequency by the total number of pixels, obtaining the probability distribution of the gray levels.
+
+After that, we applied the entropy formula. In the implementation, we excluded the probability values equal to zero before calculating the logarithm, since $log_2(0)$ is not defined. This does not alter the entropy result because gray levels that do not appear in the image do not contribute to the sum.
+
+Once the function was implemented, we calculated the entropy of the original image and of the same image after histogram equalization. The equalization process redistributes the gray levels so that the contrast becomes more balanced across the available intensity range. As a consequence, the equalized image usually presents a wider and more uniform use of the possible gray values, which can lead to a higher entropy.
+
+Visually, the equalized image shows stronger contrast and reveals details that were less noticeable in the original image. This happens because the gray levels that were previously concentrated in a narrower range are spread over a larger interval. Therefore, the resulting image contains a richer intensity distribution, which is consistent with the entropy comparison obtained from our implementation.
+
+#figure(
+  image("img/entropy4.png", width: 85%),
+  caption: [Comparison between the original image and its equalized version, including the corresponding entropy values.],
+)
 
 /*
 Exercise 5. Quantization
@@ -400,8 +420,139 @@ To binarize an image, we can use the `uniform_quantizer` function with `N=2`, wh
 )<BinarizedLena>
 
 = Quantization
+In this exercise, we created a pop-art composition inspired by Andy Warhol. The goal was to start from an image quantized into only three intensity levels, replace those three gray levels with different RGB color palettes, and finally combine four colored versions of the same image into a single composition with double the original width and height.
+
+=== Original image
+
+We began with the selected input image and converted it to grayscale when necessary. Working with a grayscale image is important in this exercise because the recoloring process is based on intensity levels rather than on the original colors. Each pixel is therefore represented by a single brightness value between 0 and 1.
+
+#figure(
+  image("img/OG16.png", width: 62%),
+  caption: [Original grayscale image used as the starting point for the Andy Warhol-style composition.],
+)
+
+=== Quantization into 3 gray levels
+
+The first required step was to quantize the grayscale image into exactly three levels. Instead of keeping a continuous range of intensities, we grouped all pixel values into three categories:
+
+- dark regions,
+- medium-intensity regions,
+- bright regions.
+
+In our implementation, we assigned each pixel to one of three discrete indices: $0$, $1$, or $2$. These indices correspond to the three gray-level classes that will later be replaced by colors. Conceptually, the quantization can be understood as dividing the normalized intensity interval $[0,1]$ into three parts.
+
+After quantization, the image loses smooth grayscale transitions and becomes visually simpler, with only three possible intensity values. This simplification is essential for producing the strong posterized appearance characteristic of pop-art compositions.
+
+#figure(
+  image("img/3levels26.png", width: 62%),
+  caption: [Image quantized into three intensity levels. The continuous grayscale range is reduced to dark, medium, and bright regions.],
+)
+
+=== Color palette mapping
+
+Once the image had been quantized, we used the three quantization levels as labels to apply color palettes. Each gray-level index was replaced by one RGB color from a given palette:
+
+- level $0$ was mapped to the first RGB color,
+- level $1$ was mapped to the second RGB color,
+- level $2$ was mapped to the third RGB color.
+
+The laboratory statement provided four different palettes, each containing three RGB colors. We applied one palette to each copy of the quantized image. This generated four versions of the same image with identical shapes and intensity regions, but with completely different chromatic appearances.
+
+This mapping preserves the structure of the original image while producing a much more expressive and stylized visual result. Dark, medium, and bright areas remain separated, but instead of appearing as gray tones, they become strongly contrasted colored regions.
+
+=== Construction of the final Warhol composition
+
+After producing the four recolored versions, we arranged them into a $2 times 2$ grid:
+
+- the first palette was used in the upper-left image,
+- the second palette was used in the upper-right image,
+- the third palette was used in the lower-left image,
+- the fourth palette was used in the lower-right image.
+
+Since the same original image is placed twice horizontally and twice vertically, the final composition has double the original width and double the original height. This fulfills the requirement of generating an output image with four duplicated colored versions of the quantized image.
+
+The final result resembles an Andy Warhol-inspired pop-art poster: the same visual content is repeated several times, but each version uses a different high-contrast palette, producing a colorful and decorative composition.
+
+#figure(
+  image("img/4img36.png", width: 60%),
+  caption: [Final Andy Warhol-style composition obtained by recoloring the 3-level quantized image with the four RGB palettes provided in the exercise.],
+)
 
 = Quantitative Criteria of Fidelity
+In this exercise, we evaluated quantitatively how much information is lost when an image is modified through uniform quantization. Instead of relying only on visual inspection, we computed two fidelity metrics between the original image and several quantized versions of it:
+
+- the least-squares error, denoted as $sigma_("LS")$,
+- the Peak Signal-to-Noise Ratio, denoted as PSNR.
+
+The exercise was carried out using the original grayscale image and three quantized versions obtained with different numbers of gray levels. In our case, we compared the original image with quantizations of 3, 11, and 58 levels.
+
+=== Least-squares error: $sigma_("LS")$
+
+The first metric we implemented was the least-squares error. It measures the average squared difference between the intensity of each pixel in the original image and the corresponding pixel in the quantized image.
+
+We computed it as:
+
+$
+sigma_("LS") =
+1 / (M N)
+sum_(i=1)^M
+sum_(j=1)^N
+(u(i,j) - v(i,j))^2
+$
+
+where:
+
+- $u(i,j)$ is the gray level of the original image at pixel $(i,j)$,
+- $v(i,j)$ is the gray level of the quantized image at the same pixel,
+- $M times N$ is the total number of pixels in the image.
+
+This quantity becomes larger when the quantized image differs more from the original one. Therefore, a high value of $sigma_("LS")$ indicates a stronger degradation, whereas a low value indicates a better approximation.
+
+=== Peak Signal-to-Noise Ratio: PSNR
+
+The second metric we implemented was the PSNR, which is commonly used to evaluate the fidelity of reconstructed or compressed images. It is expressed in decibels and was computed from the least-squares error as:
+
+$
+"PSNR" =
+10 log_10 (
+255^2 / sigma_("LS")
+)
+$
+
+The value $255$ appears because the images are represented with gray levels in the range $[0,255]$. The PSNR increases when the error decreases. Therefore:
+
+- a high PSNR means that the quantized image is close to the original,
+- a low PSNR means that the distortion introduced by quantization is more significant.
+
+=== Visual and numerical comparison
+
+The figure below shows the original image together with the three quantized versions used in our analysis. The first quantization, with only 3 gray levels, produces a very strong posterization effect and a clear loss of details. With 11 levels, the image becomes noticeably more faithful to the original, although some discontinuities in the gray transitions are still visible. Finally, the version with 58 levels is visually much closer to the original image, since the quantization steps are considerably smaller.
+
+#figure(
+  image("img/70.png", width: 92%),
+  caption: [Comparison between the original image and its uniformly quantized versions with 3, 11, and 58 gray levels.],
+)
+
+The numerical values obtained for the fidelity criteria can be summarized as follows:
+
+#table(
+  columns: 3,
+  align: center,
+  stroke: 0.5pt,
+
+  [*Number of levels*], [*$sigma_("LS")$*], [*PSNR (dB)*],
+  [3], [Insert value], [Insert value],
+  [11], [Insert value], [Insert value],
+  [58], [Insert value], [Insert value],
+)
+
+The results confirm the expected behavior. When only 3 quantization levels are used, the approximation is very rough, so the squared error is the largest and the PSNR is the smallest. This matches the strong visual degradation observed in the corresponding image.
+
+When the number of levels is increased to 11, the quantized image preserves more information from the original. As a consequence, $sigma_("LS")$ decreases and the PSNR increases. The improvement is also visible in the image, where facial details and smooth intensity transitions are better preserved.
+
+With 58 levels, the quantized image becomes much more similar to the original one. The error decreases further and the PSNR reaches its highest value among the tested cases. Visually, the differences are much less noticeable, which agrees with the numerical measurements.
+
+Therefore, both metrics show the same conclusion: increasing the number of quantization levels improves the fidelity of the reconstructed image. The least-squares error decreases, while the PSNR increases, indicating that the quantized image approaches the original more accurately.
 
 = Halftoning
 == Halftoning Analysis
