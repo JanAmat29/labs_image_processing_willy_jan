@@ -119,7 +119,7 @@ $ u = Q \{ Pi g(K * O) + n \} $ <MathArchImg>
 Answering to the question, if gamma is less than 1, the function will be concave, which means that dark tonalities are expanded and light tonalities are compressed, resulting in increased contrast in the shadows. On the other hand, if gamma is greater than 1, the function will be convex, which means that dark tonalities are compressed and light tonalities are exapanded. In this case, the result will be a decrease in shadow contrast, but an increase in highlight contrast. In @GammaGraph, we can see the graphical representation of the gamma correction function for both cases, where the x-axis represents the input light levels and the y-axis represents the output light levels after applying gamma correction. 
 
 #figure(
-  image("img/gamma_graph.png", width: 60%),
+  image("img/gamma_graph.png", width: 70%),
   caption: "Graphical representation of the gamma correction function for gamma < 1 (purple line) and gamma > 1 (yellow line)."
 )<GammaGraph>
 
@@ -131,7 +131,7 @@ There are two examples that clearly explain this behaviour. The first one is to 
 */
 
 #figure(
-  image("img/gamma_correction.png", width: 50%),
+  image("img/gamma_correction.png", width: 40%),
   caption: "Graphical representation of the gamma correction function with gamma > 1 for a light level input."
 )<GammaCorrection>
 
@@ -163,14 +163,14 @@ For this section we will modify the constrast of the image "img/low_contrast.png
 After testing different values of gamma (@Test1Gamma) ploting the image and its histogram, we found that a value of would be in the range of 1.4 to 1.5, which is a value greater than 1, so the function will be convex and the dark tonalities will be compressed and light tonalities will be expanded. This way we can visualize the dark details of the image without decreasing too much the overall contrast of the image.
 
 #figure(
-  image("img/Test1Gamma_exercise2.1.png", width: 100%),
+  image("img/Test1Gamma_exercise2.1.png", width: 70%),
   caption: "Low contrast image after applying a nonlinear contrast change with gamma = [1.3, 2.2]."
 )<Test1Gamma>
 
 To be more precise, we analyzed ten values of gamma from 1.4 to 1.5 with a step of 0.01 and we found that the best value was 1.41.
 
 #figure(
-  image("img/Test2Gamma_exercise2.1.png", width: 100%),
+  image("img/Test2Gamma_exercise2.1.png", width: 70%),
   caption: "Low contrast image after applying a nonlinear contrast change with gamma = 1.41."
 )<Test141Gamma>
 
@@ -406,7 +406,7 @@ plt.show()
 We consider the following quantization levels: 128, 64, 32, 16, 8 and 4 in @TestQuantization. After applying the quantization, we can visually analyze that from this quantization levels, the smallest that is unnoticeable is 32 levels. 16 levels already shows a significant loss of detail, mostly on the background, while 32 levels still retains most of the visual information and details without introducing significant artifacts. Therefore, we can conclude that the smallest number of quantization levels for which the quantization is unnoticeable for the eye is approximately 32 levels.
 
 #figure(
-  image("img/test_quantization.png", width: 100%),
+  image("img/test_quantization.png", width: 70%),
   caption: "Quantization of the grayscale Lena image with different levels of quantization."
 )<TestQuantization>
 
@@ -424,12 +424,7 @@ In this exercise, we created a pop-art composition inspired by Andy Warhol. The 
 
 === Original image
 
-We began with the selected input image and converted it to grayscale when necessary. Working with a grayscale image is important in this exercise because the recoloring process is based on intensity levels rather than on the original colors. Each pixel is therefore represented by a single brightness value between 0 and 1.
-
-#figure(
-  image("img/OG16.png", width: 62%),
-  caption: [Original grayscale image used as the starting point for the Andy Warhol-style composition.],
-)
+We began with the selected input image (@LowContrastImage) and converted it to grayscale when necessary. Working with a grayscale image is important in this exercise because the recoloring process is based on intensity levels rather than on the original colors. Each pixel is therefore represented by a single brightness value between 0 and 1.
 
 === Quantization into 3 gray levels
 
@@ -444,8 +439,8 @@ In our implementation, we assigned each pixel to one of three discrete indices: 
 After quantization, the image loses smooth grayscale transitions and becomes visually simpler, with only three possible intensity values. This simplification is essential for producing the strong posterized appearance characteristic of pop-art compositions.
 
 #figure(
-  image("img/3levels26.png", width: 62%),
-  caption: [Image quantized into three intensity levels. The continuous grayscale range is reduced to dark, medium, and bright regions.],
+  image("img/3levels26.png", width: 30%),
+  caption: [Image quantized into three intensity levels.],
 )
 
 === Color palette mapping
@@ -474,7 +469,7 @@ Since the same original image is placed twice horizontally and twice vertically,
 The final result resembles an Andy Warhol-inspired pop-art poster: the same visual content is repeated several times, but each version uses a different high-contrast palette, producing a colorful and decorative composition.
 
 #figure(
-  image("img/4img36.png", width: 60%),
+  image("img/4img36.png", width: 40%),
   caption: [Final Andy Warhol-style composition obtained by recoloring the 3-level quantized image with the four RGB palettes provided in the exercise.],
 )
 
@@ -560,12 +555,12 @@ Therefore, both metrics show the same conclusion: increasing the number of quant
 To complete the halftoning analysis, we applied the Floyd-Steinberg error diffusion algorithm to our test images as an alternative to standard binarization. Unlike simple two-level quantization, which forces pixels into absolute black or white and creates harsh, visible banding (false contouring), the Floyd-Steinberg method distributes the mathematical rounding error to adjacent pixels. This creates a stippled dot pattern that successfully tricks the human visual system into perceiving smooth continuous gradients. In the Lena image (@LenaHalftone), this algorithm beautifully preserves the soft tonal transitions of the skin and background using solely binary pixels. Conversely, the halftoned result for the hat image (@HatHalftone) behaves exactly as mathematically expected given its prior equalization. Because the previous equalization step severely clipped the highlights on the subject's face, those pure white regions generate no quantization error to diffuse, leaving them completely devoid of dots. The algorithm concentrates its stippling entirely in the textured midtones of the background and clothing, proving that it faithfully translates the extreme contrast of the underlying source matrix without introducing standard quantization artifacts.
 
 #figure(
-  image("img/lena_halftone.png", width: 100%),
+  image("img/lena_halftone.png", width: 70%),
   caption: "Halftoned version of the grayscale Lena image using the Floyd-Steinberg error diffusion algorithm."
 )<LenaHalftone>
 
 #figure(
-  image("img/hat_halftone.png", width: 100%),
+  image("img/hat_halftone.png", width: 70%),
   caption: "Halftoned version of the equalized hat image using the Floyd-Steinberg error diffusion algorithm."
 )<HatHalftone>
 
