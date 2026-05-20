@@ -404,7 +404,39 @@ To binarize an image, we can use the `uniform_quantizer` function with `N=2`, wh
 = Quantitative Criteria of Fidelity
 
 = Halftoning
+== Halftoning Analysis
 
+To complete the halftoning analysis, we applied the Floyd-Steinberg error diffusion algorithm to our test images as an alternative to standard binarization. Unlike simple two-level quantization, which forces pixels into absolute black or white and creates harsh, visible banding (false contouring), the Floyd-Steinberg method distributes the mathematical rounding error to adjacent pixels. This creates a stippled dot pattern that successfully tricks the human visual system into perceiving smooth continuous gradients. In the Lena image (@LenaHalftone), this algorithm beautifully preserves the soft tonal transitions of the skin and background using solely binary pixels. Conversely, the halftoned result for the hat image (@HatHalftone) behaves exactly as mathematically expected given its prior equalization. Because the previous equalization step severely clipped the highlights on the subject's face, those pure white regions generate no quantization error to diffuse, leaving them completely devoid of dots. The algorithm concentrates its stippling entirely in the textured midtones of the background and clothing, proving that it faithfully translates the extreme contrast of the underlying source matrix without introducing standard quantization artifacts.
+
+#figure(
+  image("img/lena_halftone.png", width: 100%),
+  caption: "Halftoned version of the grayscale Lena image using the Floyd-Steinberg error diffusion algorithm."
+)<LenaHalftone>
+
+#figure(
+  image("img/hat_halftone.png", width: 100%),
+  caption: "Halftoned version of the equalized hat image using the Floyd-Steinberg error diffusion algorithm."
+)<HatHalftone>
+
+== Floyd-Steinberg Algorithm Explanation
+
+The Floyd-Steinberg Algorithm is a type of halftoning algorithm used for images that involves the use of error diffusion to create the impression of continuous gradients by using binary pixels. Unlike thresholding where the pixel values are either rounded off to full black or full white while discarding the remaining fraction, the Floyd-Steinberg Algorithm computes the actual quantization error of the pixel value. In the process, the algorithm disperses the error fraction to unprocessed neighboring pixels. More specifically, the error is dispersed by $7/16$ to the right, $3/16$ to the bottom left, $5/16$ to the bottom, and $1/16$ to the bottom right. In this way, the total brightness of the area within the image is preserved, thereby avoiding any banding effects due to uniform quantization. The fundamental concept of error diffusion is illustrated below:
+
+```
+Pseudocode:
+for each y from top to bottom:
+  for each x from left to right:
+    old_pixel = image[x, y]
+    new_pixel = find_closest_palette_color(old_pixel)
+    image[x, y] = new_pixel
+    error = old_pixel - new_pixel
+    
+    // Diffuse the error to adjacent pixels
+    image[x + 1, y    ] = image[x + 1, y    ] + error * (7 / 16)
+    image[x - 1, y + 1] = image[x - 1, y + 1] + error * (3 / 16)
+    image[x    , y + 1] = image[x    , y + 1] + error * (5 / 16)
+    image[x + 1, y + 1] = image[x + 1, y + 1] + error * (1 / 16)
+```
 
 
 
