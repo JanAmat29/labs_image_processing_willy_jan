@@ -399,6 +399,14 @@ To binarize an image, we can use the `uniform_quantizer` function with `N=2`, wh
   caption: "Binarized version of the grayscale Lena image using uniform quantization with N=2."
 )<BinarizedLena>
 
+= Quantization
+
+= Quantitative Criteria of Fidelity
+
+= Halftoning
+
+
+
 
 
 
