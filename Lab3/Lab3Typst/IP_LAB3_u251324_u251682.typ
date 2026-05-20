@@ -54,6 +54,56 @@
 #set text(size: 11pt)
 
 = LINEAR CONTRAST CHANGES //Exercise 1
+In this exercise, we worked with the provided low-contrast grayscale image. First, we increased its global contrast in order to make the range of intensities wider and obtain a better starting point for the following transformations. After that, we applied five different linear contrast operations, each one modifying the gray levels in a different way.
+
+=== (a) Expansion of the dark tones [0, 0.4]
+
+In this first transformation, we expanded the dark intensity values contained in the interval $[0, 0.4]$ so that they covered the whole output range $[0, 1]$. In practice, this makes the differences between dark tones much more visible. Pixels with very low intensities remain dark, while pixels closer to $0.4$ become much brighter. As a result, the details located in the dark regions of the image are emphasized, although brighter regions tend to become saturated.
+
+#figure(
+  image("img/exercise1A.png", width: 65%),
+  caption: [Expansion of the dark tones in the interval $[0, 0.4]$.],
+)
+
+
+
+
+
+=== (b) Expansion of the light tones [0.6, 1.0]
+
+For this case, we expanded the light intensity values in the interval $[0.6, 1.0]$ to the full output range $[0, 1]$. This operation focuses only on the brightest areas of the image. Since the original image is mostly dark, only a small portion of the pixels belongs to this interval. Therefore, the resulting image becomes almost completely black, except for some small bright details that are preserved and stretched.
+
+#figure(
+  image("img/Exercise1B.png", width: 65%),
+  caption: [Expansion of the light tones in the interval $[0.6, 1.0]$.],
+)
+
+=== (c) Contrast inversion: negative image
+
+In this transformation, we computed the negative of the contrast-enhanced image. Since the image intensities were normalized in the interval $[0, 1]$, the operation was carried out by replacing each pixel value $x$ with $1 - x$. This means that dark areas become bright, bright areas become dark, and intermediate gray values remain in intermediate positions. The resulting image clearly shows the contrast inversion effect.
+
+#figure(
+  image("img/Exercise1C.png", width: 65%),
+  caption: [Negative image obtained by inverting the gray levels.],
+)
+
+=== (d) Clipping of intensity levels above 0.7
+
+In this part, we applied clipping to all intensity values greater than $0.7$. Any pixel whose value was above that threshold was limited to exactly $0.7$, while the rest of the image remained unchanged. Since the input image does not contain a large number of very bright pixels, the visual difference is not extremely strong. However, the operation reduces the intensity of the brightest regions and prevents them from reaching the maximum white level.
+
+#figure(
+  image("img/Exercice1D.png", width: 65%),
+  caption: [Clipping of intensity values above $0.7$.],
+)
+
+=== (e) Binarization at level 0.5
+
+Finally, we binarized the image using a threshold value of $0.5$. Pixels with intensity lower than $0.5$ were assigned the value $0$, corresponding to black, while pixels with intensity greater than or equal to $0.5$ were assigned the value $1$, corresponding to white. This transformation removes all intermediate gray levels and produces a purely black-and-white image. The result highlights which areas of the image are darker or brighter with respect to the chosen threshold.
+
+#figure(
+  image("img/Exercise1E.png", width: 65%),
+  caption: [Binarization of the image using a threshold of $0.5$.],
+)
 
 = NONLINEAR CONTRAST CHANGES //Exercise 2
 /* Exercise 2a. Discuss briefly how you think the value of gamma (<1 or >1) affects the
