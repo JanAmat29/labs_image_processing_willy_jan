@@ -536,9 +536,9 @@ The numerical values obtained for the fidelity criteria can be summarized as fol
   stroke: 0.5pt,
 
   [*Number of levels*], [*$sigma_("LS")$*], [*PSNR (dB)*],
-  [3], [Insert value], [Insert value],
-  [11], [Insert value], [Insert value],
-  [58], [Insert value], [Insert value],
+  [3], [1489], [16.40],
+  [11], [194.7], [25.23],
+  [58], [146.68], [26.48],
 )
 
 The results confirm the expected behavior. When only 3 quantization levels are used, the approximation is very rough, so the squared error is the largest and the PSNR is the smallest. This matches the strong visual degradation observed in the corresponding image.
