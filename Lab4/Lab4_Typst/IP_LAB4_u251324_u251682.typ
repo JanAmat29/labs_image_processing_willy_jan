@@ -198,6 +198,56 @@ At the end of this exercise, @Ex1Results shows the final results of applying the
 /* Exercise 2.
 Find a proper segmentation of the image letters.png separating the letters from the background. */
 
+The second exercise requires addressing an issue that plagues many image-processing tasks: separating hand-written text from a heavily shadowed image background. Looking at the original image below, one can see the dramatic change of illumination from left to right – ranging from darkness to brightness. Consequently, applying global threshold to such image would yield bad results: what works well for the bright area would make everything to the left black. In order to overcome this problem, we need to employ mathematical morphology and find a way to remove the background.
+
+== Background Estimation via Closing
+
+Since the text is strictly darker than the background (paper), we can use the morphological closing operation to eliminate the text and isolate the illumination gradient. 
+
+#align(center)[
+  #set math.equation(numbering: "(1)")
+  $ phi_B(X) = epsilon_B(delta_B(X)) $ <Ex2ClosingFormula>
+]
+
+The closing operator (@Ex2ClosingFormula), which applies a dilation operation followed by an erosion operation, suits this application best. Using a structuring element $B$ (as implemented in our code, a 15x15 pixel square kernel) that is bigger than the stroke width of the letters and smaller than the spaces between the text lines, we can control how the image features will behave.
+
+Since the letters themselves are black, the first operation of dilation results in shrinking the ink region to nothing at all. The following erosion process brings back the original boundaries of the now completely white text regions. In the end, we obtain (@ClosingBackground) an even image with *just* the shadow gradients left.
+
+#figure(
+  image("img/closing_background.png", width: 60%),
+  caption: "Background estimation using morphological closing."
+)<ClosingBackground>
+
+== Illumination Correction and Binarization
+
+Once we have an accurate mathematical estimation of the background, we can correct the uneven lighting in the original image.
+
+=== Subtraction (Uniform Illumination)
+
+Through subtraction of the original image from the background we estimate, we will achieve flattening of the illumination throughout the entire image. Mathematically, subtraction of the background from itself will yield a value close to black (zero), whereas subtraction of the dark ink from the brightly colored background will give a positive result (bright). This technique works well in isolating the ink, giving us bright ink on a dark background. The resulting image (@Subtracted) is now uniformly illuminated, with the text clearly standing out against a dark background.
+
+#figure(
+  image("img/subtracted.png", width: 60%),
+  caption: "Image after background subtraction, showing uniform illumination."
+)<Subtracted>
+
+=== Thresholding and Inversion
+
+Because the illumination is now perfectly uniform across the entire document, we no longer need complex adaptive algorithms. A simple, hard-coded global binarization (using a low threshold like 0 or 15) successfully separates the text from the flattened background. Finally, to restore the natural appearance of the document (dark text on a light background), we apply a bitwise inversion to flip the colors of the segmented mask. The final result (@FinalSegmented) is a clean, high-contrast binary image.
+
+#figure(
+  image("img/final_segmented.png", width: 60%),
+  caption: "Final segmented text after thresholding and inversion."
+)<FinalSegmented>
+
+== Results
+
+The image @Ex2Results reveals the entire process performed by the program. In the upper left is the original image along with its heavy gradient. The image on the upper right is the isolated background that has been computed using the closing operation. The one in the lower left is the even illumination after performing the subtraction.
+
+#figure(
+  image("img/ex2_pipeline.png", width: 65%),
+  caption: "Exercise 2 pipeline: Original, Background Estimation (Closing), Subtraction, and Final Segmentation."
+)<Ex2Results>
 
 
 = SEGMENTATION OF NOISY LETTERS
