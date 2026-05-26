@@ -53,6 +53,36 @@
 
 #set text(size: 11pt)
 
+/* Example of showing a figure:
+#figure(
+  image("img/low_contrast.png", width: 25%),
+  caption: "Original low contrast image."
+)<LowContrastImage>
+*/
+
+/* Example of showing a figure with multiple subfigures:
+  #grid(
+  columns: (1fr, 1fr),
+  gutter: 1em,
+
+  [
+    #figure(
+      image("img/lena_color.png", width: 60%),
+      caption: "Original RGB image."
+    )<LenaColorImage>
+  ],
+
+  [
+    #figure(
+      image("img/lena.png", width: 60%),
+      caption: "Original grayscale image."
+    )<LenaGrayImage>
+  ],
+  )
+*/
+
+= MORPHOLOGICAL SEPARATION, RESTORATION, AND BOUNDARY EXTRACTION
+
 /* Exercise 1.
 As seen in the following Figure, Evarist and Ermessenda just started dating.
 Perform the following tasks:
@@ -60,19 +90,24 @@ Perform the following tasks:
 • Belive it or not, someone hated evenmorethesituation and shot them. Fortunately, this is just a picture, but both guys have holes in their bodies; use morphology to heal them.
 • Getthe boundaries of the holding-hands couple. */
 
-= MORPHOLOGICAL SEPARATION, RESTORATION, AND BOUNDARY EXTRACTION
+
+
+= SEGMENTATION OF LETTERS
 
 /* Exercise 2.
 Find a proper segmentation of the image letters.png separating the letters from the background. */
 
-= SEGMENTATION OF LETTERS
+
+
+= SEGMENTATION OF NOISY LETTERS
 
 /* Exercise 3.
 Drawthree letters in a blank image with a any kind of Drawing software (Gimp or Paint work fine); introduce noise to this image with the imnoise built-in Matlab function. The goal of this task is to obtain, once again, the silhouette of all three letters. */
 
-= SEGMENTATION OF NOISY LETTERS
+
+
+= MORPHOLOGICAL GRADIENTS, TOP-HAT AND BOTTOM-HAT
 
 /* Exercise 4.
 Provide examples of morphological gradients, top-hat and bottom-hat operations in both binary and gray scale images.  Explain their main properties and differences between each other. */
 
-= MORPHOLOGICAL GRADIENTS, TOP-HAT AND BOTTOM-HAT
