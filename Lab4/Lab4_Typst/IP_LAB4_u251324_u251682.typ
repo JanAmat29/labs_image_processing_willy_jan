@@ -103,7 +103,7 @@ The operations we are going to use are also linear filters. They are based on th
   $ delta_B(X) = X + B = {x + y : x in X, y in B} = union_(y in B) (X + y) $ <DilationFormula>
 ]
 
-The first linear filter is dilation @DilationFormula, which is used to grow the boundaries of objects in a binary image. The structuring element is moved across the image, and at each position, if any of the underlying pixels are 1 (white), the output pixel is set to 1. This operation can be used to fill small holes in objects or to connect nearby objects. In @DilationExample we can see the result of applying dilation to the image of Evarist and Ermessenda.
+The first linear filter is dilation (@DilationFormula), which is used to grow the boundaries of objects in a binary image. The structuring element is moved across the image, and at each position, if any of the underlying pixels are 1 (white), the output pixel is set to 1. This operation can be used to fill small holes in objects or to connect nearby objects. In @DilationExample we can see the result of applying dilation to the image of Evarist and Ermessenda.
 
 #figure(
   image("img/dilation_example.png", width: 55%),
@@ -113,10 +113,11 @@ The first linear filter is dilation @DilationFormula, which is used to grow the 
 === Erosion
 
 #align(center)[
+  #set math.equation(numbering: "(1)")
 $ epsilon_B(X) = {x in X : x + B subset.eq X} = sect_(y in B) (X - y) $ <ErosionFormula>
 ]
 //TODO - TAG EQUATION NUMBERING
-The second linear filter is erosion ErosionFormula, which is used to shrink the boundaries of objects in a binary image. The structuring element is moved across the image, and at each position, if all of the underlying pixels are 1 (white), the output pixel is set to 1. This operation can be used to remove small objects or to separate connected objects. In @ErosionExample we can see the result of applying erosion to the image of Evarist and Ermessenda.
+The second linear filter is erosion (@ErosionFormula), which is used to shrink the boundaries of objects in a binary image. The structuring element is moved across the image, and at each position, if all of the underlying pixels are 1 (white), the output pixel is set to 1. This operation can be used to remove small objects or to separate connected objects. In @ErosionExample we can see the result of applying erosion to the image of Evarist and Ermessenda.
 
 #figure(
   image("img/erosion_example.png", width: 50%),
@@ -128,10 +129,11 @@ The second linear filter is erosion ErosionFormula, which is used to shrink the 
 === Opening & No Holding Hands
 
 #align(center)[
+  #set math.equation(numbering: "(1)")
 $ gamma_B(X) = delta_B(epsilon_B(X)) $ <OpeningFormula>
 ]
 
-The third linear filter is opening OpeningFormula, which is a combination of erosion followed by dilation. This operation can be used to remove small objects or to separate connected objects while preserving the shape of larger objects. In @OpeningExample we can see the result of applying opening to the image of Evarist and Ermessenda. In this case, we can see that the hands of Evarist and Ermessenda are separated, but the rest of their bodies are preserved. This is because the opening operation removes small objects (the hands) while preserving larger objects (the bodies). In detail, the left arm of Evarist and both arms of Ermessenda are removed, the aim was simply to separate the hands, but the structuring element used for the opening operation was too large, which caused the removal of the arms as well. This is a common issue when using morphological operations, and it is important to choose the right structuring element size to achieve the desired result. After several trials, we found that a structuring element of size 5x5 and setting the number of iterations to 1 was the best option.
+The third linear filter is opening (@OpeningFormula), which is a combination of erosion followed by dilation. This operation can be used to remove small objects or to separate connected objects while preserving the shape of larger objects. In @OpeningExample we can see the result of applying opening to the image of Evarist and Ermessenda. In this case, we can see that the hands of Evarist and Ermessenda are separated, but the rest of their bodies are preserved. This is because the opening operation removes small objects (the hands) while preserving larger objects (the bodies). In detail, the left arm of Evarist and both arms of Ermessenda are removed, the aim was simply to separate the hands, but the structuring element used for the opening operation was too large, which caused the removal of the arms as well. This is a common issue when using morphological operations, and it is important to choose the right structuring element size to achieve the desired result. After several trials, we found that a structuring element of size 5x5 and setting the number of iterations to 1 was the best option.
 
 #figure(
   image("img/opening_example.png", width: 50%),
@@ -141,10 +143,11 @@ The third linear filter is opening OpeningFormula, which is a combination of ero
 === Closing & Healing Holes
 
 #align(center)[
+  #set math.equation(numbering: "(1)")
 $ phi_B(X) = epsilon_B(delta_B(X)) $ <ClosingFormula>
 ]
 
-The fourth linear filter is closing ClosingFormula, which is a combination of dilation followed by erosion. This operation can be used to fill small holes in objects or to connect nearby objects while preserving the shape of larger objects. In @ClosingExample we can see the result of applying closing to the image of Evarist and Ermessenda. In this case, we can see that the holes in the bodies of Evarist and Ermessenda are filled, but the rest of their bodies are preserved. This is because the closing operation fills small holes (the holes in the bodies) while preserving larger objects (the bodies). In this task we got a better result that we did in the last one, and finding the right structuring element size was easier, we found that a structuring element of size 4x4 and setting the number of iterations to 1 was the best option.
+The fourth linear filter is closing (@ClosingFormula), which is a combination of dilation followed by erosion. This operation can be used to fill small holes in objects or to connect nearby objects while preserving the shape of larger objects. In @ClosingExample we can see the result of applying closing to the image of Evarist and Ermessenda. In this case, we can see that the holes in the bodies of Evarist and Ermessenda are filled, but the rest of their bodies are preserved. This is because the closing operation fills small holes (the holes in the bodies) while preserving larger objects (the bodies). In this task we got a better result that we did in the last one, and finding the right structuring element size was easier, we found that a structuring element of size 4x4 and setting the number of iterations to 1 was the best option.
 
 #figure(
   image("img/closing_example.png", width: 50%),
@@ -155,7 +158,7 @@ The exercise has not finished with this last filter because we still have to get
 
 == Residues
 
-=== Centered Graidient & Boundary Extraction
+=== Centered Gradient & Boundary Extraction
 
 /* The centered gradient of u is defined as the difference between the dilation
 and the erosion of u by B, that is,
@@ -168,10 +171,11 @@ detection in greyscale images.
  */
 
 #align(center)[
+  #set math.equation(numbering: "(1)")
 $ nabla^c_B(u) = delta_B(u) - epsilon_B(u) $ <CenteredGradientFormula>
 ]
  
-The name of this filter CenteredGradientFormula is quite self-explanatory, it is a gradient that is centered in the original image, and it is obtained by subtracting the erosion from the dilation. This operation can be used to edge detection in greyscale images. In @CenteredGradientExample we can see the result of applying the centered gradient to the image of Evarist and Ermessenda. For this result, we can see that the boundaries of Evarist and Ermessenda are preserved, but the rest of their bodies are extracted. The reason why this happens is because the centered gradient operation preserves the edges of objects while removing the interior pixels. This is because the dilation operation expands the boundaries of objects, while the erosion operation shrinks the boundaries of objects. When we subtract the erosion from the dilation, we are left with only the edges of objects, which is what we wanted to achieve in this task. An interesting observation out of this result is that the holes in the bodies of Evarist and Ermessenda are also preserved, this is because the dilation operation fills the holes, while the erosion operation removes the holes. When we subtract the erosion from the dilation, we are left with only the edges of objects, which includes the holes in this case. For this task we found that a structuring element of size 3x3 and setting the number of iterations to 1 was the best option.
+The name of this filter (@CenteredGradientFormula) is quite self-explanatory, it is a gradient that is centered in the original image, and it is obtained by subtracting the erosion from the dilation. This operation can be used to edge detection in greyscale images. In @CenteredGradientExample we can see the result of applying the centered gradient to the image of Evarist and Ermessenda. For this result, we can see that the boundaries of Evarist and Ermessenda are preserved, but the rest of their bodies are extracted. The reason why this happens is because the centered gradient operation preserves the edges of objects while removing the interior pixels. This is because the dilation operation expands the boundaries of objects, while the erosion operation shrinks the boundaries of objects. When we subtract the erosion from the dilation, we are left with only the edges of objects, which is what we wanted to achieve in this task. An interesting observation out of this result is that the holes in the bodies of Evarist and Ermessenda are also preserved, this is because the dilation operation fills the holes, while the erosion operation removes the holes. When we subtract the erosion from the dilation, we are left with only the edges of objects, which includes the holes in this case. For this task we found that a structuring element of size 3x3 and setting the number of iterations to 1 was the best option.
 
 #figure(
   image("img/centered_gradient_example.png", width: 50%),
