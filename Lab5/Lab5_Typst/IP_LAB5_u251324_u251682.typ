@@ -53,6 +53,25 @@
 
 #set text(size: 11pt)
 
+// 1. Define the style for inline raw text
+#show raw.where(block: false): it => box(
+  fill: rgb("#faeded"), // Light pink/red background color
+  inset: (x: 3pt, y: 0pt), // Padding inside the box
+  outset: (y: 3pt),
+  radius: 2pt, // Rounded corners
+  text(fill: rgb("000000"), it) // Ensures the text itself is black
+)
+
+// 2. Use standard backticks in your text
+The python functions are `highlighted`.
+
+/*
+#figure(
+  image("img/dilation_example.png", width: 55%),
+  caption: "Dilation example."
+)<DilationExample>
+*/
+
 /*
 1 Modulus and phase of the DFT of an image
 Figure 1: Left: image u1 (roma.png). Right: image u2 (texture.png).
@@ -74,7 +93,52 @@ b) Comment and explain the results you obtained.
 
 = MODULUS AND PHASE OF THE DFT OF AN IMAGE
 
+In this first exercise we are going to explore the modulus and phase of the DFT of an image. Given two images $hat(u)_1$ and $hat(u)_2$ (@ImgRoma and @ImgTexture) and their discrete Fourier transform $hat(u)_1$ and $hat(u)_2$ we are going to generate two new images $hat(v)_1$ and $hat(v)_2$ whose discrete Fourier transform are defined as follows in (@ModCarPhaseText) and (@ModTextPhaseCar).
 
+#align(center)[
+#set math.equation(numbering: "(1)")
+$ hat(v)_1 = |hat(u)_1| e^(i "arg"(hat(u)_2)) $ <ModCarPhaseText>
+
+$ hat(v)_2 = |hat(u)_2| e^(i arg(hat(u)_1)) $ <ModTextPhaseCar>
+
+]
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 0.9em,
+
+  [#figure(
+    image("img/roma.png", width: 50%),
+    caption: "Image u1 (roma.png)."
+  ) <ImgRoma>],
+
+  [#figure(
+    image("img/texture.png", width: 50%),
+    caption: "Image u2 (texture.png)."
+  ) <ImgTexture>],
+)
+
+== Creation of $bold(hat(v)_1)$ (Modulus of $bold(hat(u)_1)$ and phase of $bold(hat(u)_2)$)
+
+The procediment to create $hat(v)_1$ starts by computing the DFT of the input images $hat(u)_1$ and $hat(u)_2$ (_ `fft2()`_). Then we compute the modulus of $hat(u)_1$ (_ `np.abs()`_) and the phase of $hat(u)_2$ (_ `np.angle()`_) and we combine them to create $hat(v)_1$ as defined in (@ModCarPhaseText) (_ `modCar * np.exp(1j * phaseTexture)`_ ). Finally, we compute the inverse DFT of $hat(v)_1$ to obtain the synthesized image $v_1$ seen in @ModCarPhaseImage.
+
+#figure(
+  image("img/ModCarPhase.png", width: 30%),
+  caption: "Image v1 (modulus of hat(u)_1 and phase of hat(u)_2)."
+) <ModCarPhaseImage>
+
+@ModCarPhaseImage shows that the synthesized image $hat(v)_1$ has the structure of the image $hat(u)_2$ (texture.png) but with the intensity values of the image $hat(u)_1$ (roma.png). This is because the phase of the DFT contains the structural information of the image, while the modulus contains the intensity information. For this case, as the geometry of the image $hat(u)_2$ does not follow a clear structure, it is difficult to identify similar shapes of the image $hat(u)_2$ in the synthesized image $hat(v)_1$. Moreover, in realistic cases, we would not be interested to create an image with the intensity values of $hat(u)_1$, due to is not a texture image that creates a aesthetic result. However, knowing the properties of the DFT allows us to understand how the phase and modulus contribute to the final synthesized image.
+
+== Creation of $bold(hat(v)_2)$ (Modulus of $bold(hat(u)_2)$ and phase of $bold(hat(u)_1)$)
+
+The procediment to create $hat(v)_2$ is the same as for $hat(v)_1$ but in this case we compute the modulus of $hat(u)_2$ and the phase of $hat(u)_1$. The resulting synthesized image $v_2$ is shown in @ModTextPhaseImage.
+
+#figure(
+  image("img/ModTextPhase.png", width: 30%),
+  caption: "Image v2 (modulus of hat(u)_2 and phase of hat(u)_1)."
+) <ModTextPhaseImage>
+
+@ModTextPhaseImage shows that the synthesized image $hat(v)_2$ retains the structural geometry of image $hat(u)_1$ (roma.png), but adopts the intensity and textural characteristics of image $hat(u)_2$ (texture.png). Because the geometry of $hat(u)_1$ is highly structured, the shape of the car remains easily identifiable in $hat(v)_2$. Furthermore, since $hat(u)_2$ is a texture, its modulus imparts a vintage, print-like effect to the synthesized image. Visually, $hat(v)_2$ resembles an aged, printed photograph of an old car. This aesthetic shift is strictly due to the application of the modulus of $hat(u)_2$, which softens the high contrast and modern definition present in the original car image, creating a faded, historical appearance.
 
 /*
 2 Random Phase Noise (RPN)
