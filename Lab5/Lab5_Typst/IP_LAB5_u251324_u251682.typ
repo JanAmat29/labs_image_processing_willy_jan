@@ -200,6 +200,74 @@ size.
 
 = EFROS AND LEUNG’S METHOD
 
+The matching patch size for each synthesized texture is as follows:
+- v1: 33x33
+- v2: 9x9
+- v3: 5x5
+- v4: 9x9
+- v5: 33x33
+- v6: 5x5
+
+== 33x33 (v1 and v5)
+
+These copies of map images of $v_1$ and $v_5$ (@efros_v1 and @efros_v5) demonstrate large and continuous areas of flat-colored regions. Large patch sizes mean that the algorithm is forced to find the macro-texture of the input image, thereby copying larger portions of the image as intact regions in order to preserve the structure of, say, the entire bricks and large holes of the sponge.
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 0.9em,
+
+  [#figure(
+    image("img/efros_v1.png", width: 100%),
+    caption: "Copy map for v1 (33x33 patch size)."
+  ) <efros_v1>],
+
+  [#figure(
+    image("img/efros_v5.png", width: 100%),
+    caption: "Copy map for v5 (33x33 patch size)."
+  ) <efros_v5>],
+)
+
+== 9x9 (v2 and v4)
+
+Both the copy maps of $v_2$ (@efros_v2) and $v_4$ (@efros_v4) consist of color patches of intermediate sizes and some speckling. In these texture images, we can still see structural elements in terms of rigid macro-structures, but these structures have become more blurred or discontinuous in some places.
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 0.9em,
+
+  [#figure(
+    image("img/efros_v2.png", width: 100%),
+    caption: "Copy map for v2 (9x9 patch size)."
+  ) <efros_v2>],
+
+  [#figure(
+    image("img/efros_v4.png", width: 100%),
+    caption: "Copy map for v4 (9x9 patch size)."
+  ) <efros_v4>],
+)
+
+== 5x5 (v3 and v6)
+
+The copies in @efros_v3 and @efros_v6 are extremely fragmented and appear like static noises. Very few patches result in details being extracted such as texture or colors, but fail entirely to extract anything larger than that. This is because very few patches can be found matching in a lot of places in the original image and thus result in random selection of patches across the image.
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 0.9em,
+
+  [#figure(
+    image("img/efros_v3.png", width: 100%),
+    caption: "Copy map for v3 (5x5 patch size)."
+  ) <efros_v3>],
+
+  [#figure(
+    image("img/efros_v6.png", width: 100%),
+    caption: "Copy map for v6 (5x5 patch size)."
+  ) <efros_v6>],
+)
+
+
+
+
 /*
 4 Optional
 Figure 7: Input image clouds.png.
