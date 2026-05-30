@@ -252,8 +252,98 @@ The image @Ex2Results reveals the entire process performed by the program. In th
 
 = SEGMENTATION OF NOISY LETTERS
 
-/* Exercise 3.
-Drawthree letters in a blank image with a any kind of Drawing software (Gimp or Paint work fine); introduce noise to this image with the imnoise built-in Matlab function. The goal of this task is to obtain, once again, the silhouette of all three letters. */
+In this exercise, the goal is to start from a hand-drawn image containing three letters, corrupt it with artificial noise, and then recover the silhouette of the letters using mathematical morphology. In our case, the image contains the letters "A", "B", and "C" drawn manually on a white background.
+
+It is important to mention that the original letters are not fully filled. They are mainly drawn as outlines. This directly affects the final result: the algorithm preserves the geometric structure of the input image, so the recovered silhouette and final contour also keep this outline-like appearance instead of becoming solid filled letters.
+
+== Original Image
+
+The first image, shown in @Ex3Original, is the original hand-drawn input. It contains three letters over a bright background. The relevant information in this image is the geometry of the letters rather than the exact intensity values of the pixels.
+
+Since the letters were drawn manually, their strokes are not perfectly uniform. Some parts are darker than others, and the contours are slightly irregular. This makes the problem more realistic than using computer-generated text, because the segmentation algorithm has to work with an imperfect input image.
+
+#figure(
+  image("img/IMG_ORIGINAL.png", width: 55%),
+  caption: "Original hand-drawn image containing the three letters."
+)<Ex3Original>
+
+== Noise Addition
+
+The second image, shown in @Ex3Noisy, corresponds to the same input after adding salt-and-pepper noise. This type of noise randomly changes some pixels to very dark or very bright values. As a result, many small noisy points appear both in the background and around the strokes of the letters.
+
+The purpose of this step is to simulate a degraded image acquisition process. After adding noise, the image becomes harder to segment, because some noisy pixels have intensity values similar to the letter strokes. Therefore, a later cleaning stage is needed.
+
+In our implementation, salt-and-pepper noise was added with an amount of 0.20. This introduces a visible amount of corruption while still preserving the main structure of the letters.
+
+#figure(
+  image("img/IMG_RUIDO.png", width: 55%),
+  caption: "Image after adding salt-and-pepper noise."
+)<Ex3Noisy>
+
+== Binarization
+
+The third image, shown in @Ex3Binarized, is the result of applying thresholding to the noisy image. Binarization converts the grayscale image into a binary mask, where each pixel is classified either as foreground or background.
+
+In this case, the letters are darker than the background, so pixels below the selected threshold are classified as part of the letters. The threshold was computed automatically using Otsu's method, which searches for an intensity value that separates the image into two main classes.
+
+However, the binarized image still contains noise. Some isolated pixels are incorrectly classified as foreground because the salt-and-pepper noise introduces dark points in the background. This explains why thresholding alone is not enough to obtain a clean result.
+
+#figure(
+  image("img/IMG_BINARIA.png", width: 55%),
+  caption: "Binarized image obtained after thresholding the noisy input."
+)<Ex3Binarized>
+
+== Morphological Cleaning
+
+After binarization, morphological operations are applied to clean the binary mask. First, small connected components are removed. These small components usually correspond to isolated noise pixels that do not belong to the actual letters.
+
+Then, small holes are filled to make the detected regions more coherent. Finally, opening and closing operations are applied.
+
+#align(center)[
+  #set math.equation(numbering: "(1)")
+  $ gamma_B(X) = delta_B(epsilon_B(X)) $ <Ex3OpeningFormula>
+]
+
+The opening operation (@Ex3OpeningFormula) consists of an erosion followed by a dilation. It is useful for removing small foreground artifacts while preserving larger structures.
+
+#align(center)[
+  #set math.equation(numbering: "(1)")
+  $ phi_B(X) = epsilon_B(delta_B(X)) $ <Ex3ClosingFormula>
+]
+
+The closing operation (@Ex3ClosingFormula) consists of a dilation followed by an erosion. It helps to close small gaps and connect nearby regions that should belong to the same object.
+
+The result of this cleaning process is shown in @Ex3Clean. Most of the random noise has disappeared, while the main shape of the three letters has been preserved. Since the original letters were drawn as outlines, the cleaned silhouette also keeps this hollow structure.
+
+#figure(
+  image("img/IMG_SILUETA_LIMPIA.png", width: 55%),
+  caption: "Cleaned silhouette after removing small objects, filling holes, and applying opening and closing."
+)<Ex3Clean>
+
+== Final Contour Extraction
+
+The final step consists of extracting the contour of the cleaned letters. This is done using a morphological boundary operation based on dilation and erosion.
+
+#align(center)[
+  #set math.equation(numbering: "(1)")
+  $ partial X = delta_B(X) - epsilon_B(X) $ <Ex3BoundaryFormula>
+]
+
+The idea behind @Ex3BoundaryFormula is that dilation slightly expands the foreground regions, while erosion slightly shrinks them. The difference between both results highlights the pixels located near the boundary of the objects.
+
+The final contour is shown in @Ex3Contour. The letters are clearly detected, and their boundaries are visible. Since the original letters were hollow outlines, the final contour contains both the external and internal borders of the strokes. This is not an error, but the expected behaviour for this type of input image.
+
+#figure(
+  image("img/IMG_CONTORNO_FINAL.png", width: 55%),
+  caption: "Final contour extracted from the cleaned binary mask."
+)<Ex3Contour>
+
+== Results
+
+The complete process shows how mathematical morphology can recover useful geometric information from a noisy image. Starting from a hand-drawn input, noise was added, the image was binarized, and several morphological operations were applied to remove artifacts and preserve the shape of the letters.
+
+The final result successfully detects the three letters and extracts their contours. The fact that the contour appears as a double outline is a consequence of the original drawing: the letters were drawn as outlines rather than as filled solid shapes. If the original letters had been filled in black, the cleaned silhouette would have appeared as solid letters and the final contour would mainly represent their external boundary.
+
 
 
 
