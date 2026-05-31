@@ -169,6 +169,91 @@ sion.
 */
 
 = RANDOM PHASE NOISE (RPN)
+In this second exercise we are going to study the Random Phase Noise (RPN) texture synthesis method. The main idea of this algorithm is to generate a new texture by preserving the modulus of the DFT of the original image, but replacing its phase with a random phase. Given an input texture $u$, the synthesized texture $v$ is defined as follows:
+
+#align(center)[
+#set math.equation(numbering: "(1)")
+$ hat(v)(s, t) = |hat(u)(s, t)| e^(i phi(s, t)), quad (s, t) in hat(Omega) $ <RPNEquation>
+]
+
+In (@RPNEquation), $|hat(u)(s, t)|$ represents the modulus of the DFT of the input texture, while $phi(s, t)$ represents a random phase. This means that the synthesized image keeps the frequency content of the original texture but changes the spatial organization of its pixels.
+
+The reason why this method is useful for texture synthesis is that many textures are mainly characterized by their frequency distribution. The modulus of the Fourier transform contains information about the scale of the details, the dominant frequencies, the roughness and the repetitive behaviour of the image. On the other hand, the phase contains most of the spatial arrangement of the image. Therefore, when the phase is randomized, the exact position of the original structures is lost, but the general textural appearance can still be preserved.
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 0.9em,
+
+  [#figure(
+    image("img/textil-1-gray.png", width: 60%),
+    caption: "Input texture textil-1-gray.png."
+  ) <ImgTextilOne>],
+
+  [#figure(
+    image("img/textil-2-gray.png", width: 60%),
+    caption: "Input texture textil-2-gray.png."
+  ) <ImgTextilTwo>],
+)
+
+== Grayscale RPN algorithm
+
+The first part of the exercise consists in applying the RPN method to grayscale textures. Since grayscale images only have one intensity channel, the method can be applied directly to the image values.
+
+The algorithm starts by generating a random phase. This is done by creating a Gaussian white noise image and taking the phase of its DFT. The phase of the DFT of Gaussian white noise behaves as a random phase, so it can be used to replace the phase of the original texture.
+
+Then, the DFT of the input texture is computed. From this transform, only the modulus is preserved. This modulus contains the frequency information of the original texture. After that, the preserved modulus is combined with the random phase. Finally, the inverse DFT is computed to obtain the synthesized texture in the spatial domain.
+
+The important point is that the output image does not copy the original texture pixel by pixel. Instead, it creates a new image with similar frequency characteristics. This means that the synthesized texture can have a similar granularity, roughness or periodicity, but the local structures appear in different positions.
+
+#figure(
+  image("img/Exercise2_1_output.png", width: 75%),
+  caption: "Output of the grayscale RPN algorithm applied to textil-1-gray.png and textil-2-gray.png."
+) <RPNGrayOutput>
+
+== Comment on the grayscale results
+
+@RPNGrayOutput shows the result of applying the RPN method to the two grayscale input textures. In both cases, the synthesized image keeps some visual characteristics of the original texture, but it does not preserve the exact spatial position of the details.
+
+For textil-1-gray.png, the result is visually coherent because the original texture is mainly stochastic. It does not contain strong geometric shapes or clear objects. Therefore, preserving the Fourier modulus is enough to keep a similar grainy appearance. The synthesized texture has a similar scale of details and a similar roughness to the original one.
+
+For textil-2-gray.png, the result is less structurally faithful. This texture has a more regular and organized pattern, so its appearance depends more strongly on the Fourier phase. When the phase is randomized, the precise organization of the pattern is lost. However, the synthesized image still preserves some global properties, such as the dominant frequencies and the general size of the texture elements.
+
+This shows that RPN works better for random or homogeneous textures than for highly structured textures. The reason is that random textures are mainly described by their frequency content, while structured textures depend more on the phase, which contains the spatial arrangement of the image.
+
+== Extension to colour images
+
+The next step is to extend the RPN algorithm to colour images. A colour image has three channels: red, green and blue. The method could be applied independently to each channel, but this would create an important problem. If each channel uses a different random phase, the spatial relation between the red, green and blue components is broken. As a result, colours that were not present in the original image could appear.
+
+To avoid this problem, the same random phase must be used for the three colour channels. Each channel keeps its own Fourier modulus because each colour channel has its own frequency content. However, all channels share the same randomized phase. This keeps the spatial relationship between the colour channels and prevents the appearance of unrealistic colours.
+
+#figure(
+  image("img/bricks.png", width: 35%),
+  caption: "Input colour texture bricks.png."
+) <ImgBricks>
+
+#figure(
+  image("img/Exercise2_4_output.png", width: 75%),
+  caption: "Output of the colour RPN algorithm applied to bricks.png."
+) <RPNBricksOutput>
+
+== Comment on the colour result
+
+@RPNBricksOutput shows the result of applying the colour RPN method to bricks.png. The synthesized image preserves part of the global appearance of the original texture. The reddish and brown colours of the bricks are still present because the Fourier modulus of each colour channel has been preserved.
+
+However, the exact brick structure is not perfectly maintained. The regular arrangement of the bricks depends strongly on the Fourier phase. Since the phase has been randomized, the clear geometric organization of the wall is partially destroyed. As a result, the synthesized image keeps a brick-like appearance in terms of colour and frequency content, but it does not reproduce the original wall structure exactly.
+
+This result confirms one of the limitations of the RPN method. It is suitable for stochastic textures, but it is less effective for textures with strong geometric structures. In structured textures such as bricks, the phase contains essential information about the position, alignment and shape of the elements.
+
+== Difference between grayscale and colour RPN
+
+The grayscale version is simpler because it only works with one channel. The algorithm only has to preserve the Fourier modulus of one image and replace its phase with a random phase.
+
+The colour version is more delicate because it has to preserve the coherence between the three RGB channels. If a different random phase is used for each channel, the red, green and blue components are randomized differently. This breaks their spatial alignment and can generate artificial colours that were not present in the original image.
+
+For this reason, the colour version uses the same random phase for all channels. This keeps the spatial relationship between the colour channels and produces more coherent colours. The result is still randomized, but the colours remain closer to the original ones.
+
+In conclusion, grayscale RPN only has to preserve texture frequency information, while colour RPN must also preserve the relationship between colour channels. This is why using the same random phase for all RGB channels is necessary in the colour extension of the algorithm.
+
 
 /*
 3 Efros and Leung’s method
@@ -286,3 +371,75 @@ e) Explain the difference between both results
 */
 //put a name that is not "Optional"
 = SYMMETRIC RANDOM PHASE NOISE (SRPN)
+In this optional exercise we apply the Random Phase Noise method to the image clouds.png. The objective is to compare the direct RPN synthesis with a second approach based on a symmetric extension of the image. The main idea is that the DFT assumes periodicity at the image boundaries. Therefore, if the borders of the image do not match properly, discontinuities may appear and affect the synthesized texture.
+
+== RPN applied directly to clouds.png
+
+First, we synthesize the image clouds.png using the RPN method implemented in Exercise 2. In this case, the algorithm is applied directly to the original image. As in the previous exercise, the modulus of the Fourier transform is preserved and the phase is replaced by a random phase.
+
+#figure(
+  image("img/4_A_Output.png", width: 75%),
+  caption: "Output of the RPN method applied directly to clouds.png."
+) <RPNCloudsDirect>
+
+@RPNCloudsDirect shows that the synthesized image preserves the general cloudy appearance of the original texture. This happens because the Fourier modulus keeps the frequency distribution of the image. Since clouds are a natural and mostly stochastic texture, RPN is able to generate a visually coherent result.
+
+However, the result can contain some artifacts related to the boundaries of the image. This is because the Fourier transform treats the image as periodic. Therefore, the right border is implicitly connected to the left border, and the top border is connected to the bottom border. If these borders do not match smoothly, artificial discontinuities can appear in the synthesis.
+
+== Symmetric extension of clouds.png
+
+In the second part, we generate a symmetric version $w$ of the image clouds.png. If the original image has size $M times N$, the new image $w$ has size $2M times 2N$.
+
+The construction follows a mirror scheme. The original image is placed in the upper-left part, a horizontally flipped version is placed on the upper-right part, a vertically flipped version is placed on the lower-left part, and a version flipped both horizontally and vertically is placed on the lower-right part.
+
+#align(center)[
+$ w = mat(
+  F, "flip_h"(F);
+  "flip_v"(F), "flip_v"("flip_h"(F))
+) $
+]
+
+#figure(
+  image("img/4_B_Output.png", width: 65%),
+  caption: "Symmetric version of clouds.png with size 2M x 2N."
+) <CloudsSymmetric>
+
+@CloudsSymmetric shows the symmetric extension of the original cloud image. The purpose of this construction is to make the borders more continuous. Since each side is mirrored, the transition between opposite borders becomes smoother than in the original image.
+
+This is useful because the DFT assumes that the image is periodic. By using a symmetric image, the periodic repetition creates fewer visible discontinuities at the boundaries.
+
+== RPN applied to the symmetric image
+
+After constructing the symmetric image $w$, we apply the RPN method to it. The process is the same as before: we compute the Fourier transform of $w$, preserve its modulus, replace its phase with a random phase, and then compute the inverse Fourier transform.
+
+#figure(
+  image("img/4_C_Output.png", width: 65%),
+  caption: "RPN synthesis applied to the symmetric version of clouds.png."
+) <RPNCloudsSymmetric>
+
+@RPNCloudsSymmetric shows the RPN synthesis obtained from the symmetric image. Since the input image is larger and has smoother boundary transitions, the Fourier transform is less affected by artificial border discontinuities.
+
+The result is still random because the phase has been replaced, but the global cloudy texture is preserved. The use of the symmetric extension helps to reduce artifacts caused by the periodic assumption of the DFT.
+
+== Cropping and comparison
+
+In this part, we extract the upper-left region of the synthesized symmetric image. The extracted region has the same size $M times N$ as the original clouds.png. This cropped image is then compared with the result obtained by applying RPN directly to the original image.
+
+#figure(
+  image("img/4_D_Output.png", width: 85%),
+  caption: "Comparison between the original image, direct RPN, and cropped symmetric RPN."
+) <RPNCloudsComparison>
+
+@RPNCloudsComparison compares the original image, the direct RPN result and the cropped result obtained from the symmetric RPN synthesis. Both synthesized images preserve the general cloud-like texture because both methods keep the Fourier modulus of the original information.
+
+However, the symmetric version usually produces a smoother result near the borders. This is because the symmetric extension reduces the discontinuities that appear when the Fourier transform assumes periodic repetition of the image. In contrast, the direct RPN method may introduce more visible artifacts if the borders of the original image are not naturally continuous.
+
+== Explanation of the difference
+
+The main difference between both results comes from the boundary behaviour of the Fourier transform. When we apply the DFT to an image, the image is treated as if it were periodically repeated in all directions. This means that the left border is assumed to continue from the right border, and the top border is assumed to continue from the bottom border.
+
+If the borders of the original image do not match, this periodic repetition creates artificial jumps. These jumps introduce high-frequency components that can affect the RPN synthesis and produce visible artifacts.
+
+The symmetric extension reduces this problem. By reflecting the image horizontally and vertically, the borders become more continuous. As a result, the periodic repetition assumed by the DFT is smoother. When RPN is applied to this symmetric image and the upper-left part is extracted, the final texture usually contains fewer boundary artifacts.
+
+In conclusion, direct RPN is simple and works reasonably well for stochastic textures such as clouds. However, symmetric RPN improves the result because it reduces boundary discontinuities before applying the Fourier transform. Therefore, the cropped symmetric RPN result is usually smoother and more natural than the direct RPN result.
