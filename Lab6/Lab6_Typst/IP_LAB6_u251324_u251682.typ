@@ -65,11 +65,6 @@
 // 2. Use standard backticks in your text
 The python functions are `highlighted`.
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> ec4ffb9ca1afd1eb3ac3fc933d91ccb400a8a585
 /*
 #figure(
   image("img/dilation_example.png", width: 55%),
@@ -77,14 +72,14 @@ The python functions are `highlighted`.
 )<DilationExample>
 */
 
-<<<<<<< HEAD
-/* 
 
+ 
+/*
 LAB EXPLANATION
 
 n this lab, we will learn how to implement and train an Autoencoder based model (A
-=======
-/* All the information given in text of the lab is as follows:
+
+All the information given in text of the lab is as follows:
 
 In this lab, we will learn how to implement and train an Autoencoder based model (A
 >>>>>>> ec4ffb9ca1afd1eb3ac3fc933d91ccb400a8a585
@@ -99,7 +94,7 @@ Let us first inspect the dataset after downloading it online, let us see what th
 dataset contains and what data exactly do we need for training this model, since we
 have loaded the dataset using tensorflow dataset, we can check the structure of the
 dataset by printing ds_info:
-<<<<<<< HEAD
+
 We see the only thing important for us here is the feature dictionary which is nothing
 =======
 Wesee the only thing important for us here is the feature dictionary which is nothing
@@ -120,7 +115,7 @@ Webuild the model with just a few layers to build a small Unet model and train i
 model using helper functions,
 
 Weshow the prediction of the trained model against the true mask this time and here
->>>>>>> ec4ffb9ca1afd1eb3ac3fc933d91ccb400a8a585
+
 you can see a significant difference in predicted mask,
 Finally, Any random pet image from the internet is downloaded and we test our
 model on that, let’s see how good our model prediction is on a real life image outside
@@ -142,7 +137,6 @@ in your report but justify your answer why it did not work. You can check the li
 datasets available on tfds using this code,
 Check this url to find more information about the datasets,
 https://www.tensorflow.org/datasets/catalog/overview
-<<<<<<< HEAD
 */
 
 = Image segmentation with U-Net (Oxford-IIIT Pet)
@@ -202,8 +196,4 @@ In our laboratory experiments, the simplest improvements (more epochs and fine-t
 = Conclusions
 
 We have implemented a simple U-Net with a pre-trained encoder to segment images of pets. The model learnt to distinguish the animal from the background after sufficient training, as shown in the sample figures. The most commonly used metrics in segmentation (IoU, precision/F1) confirm this good performance, although they are slightly lower than the pixel-wise accuracy. Experiments involving more epochs, different optimisers or regularisation helped to fine-tune performance: increases in accuracy of around ~2–4% were possible, though not always significant. Ultimately, the procedure demonstrated how adjusting hyperparameters (learning rate, epochs, dropout) and using data augmentation can enhance robustness. For similar tasks, we would also recommend trying to fine-tune the encoder or using deeper architectures if the baseline performance is insufficient. In our experience, the final model segments the outlines of dogs and cats with good accuracy, as evidenced by the predicted masks in the final examples.
-=======
 
-*/
-
->>>>>>> ec4ffb9ca1afd1eb3ac3fc933d91ccb400a8a585
